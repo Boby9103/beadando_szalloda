@@ -7,7 +7,7 @@ class Szoba(ABC):
 
 class EgyagyasSzoba(Szoba):
     def __init__(self, ar):
-        super().__init__(None, ar)  # Szobaszámot később adjuk meg
+        super().__init__(None, ar)  #szobaszámot később adjuk meg
         self.tipus = "egyágyas"
 
     def info(self):
@@ -15,11 +15,11 @@ class EgyagyasSzoba(Szoba):
 
 class KetagyasSzoba(Szoba):
     def __init__(self, ar):
-        super().__init__(None, ar)  # Szobaszámot később adjuk meg
-        self.tipus = "kétagyas"
+        super().__init__(None, ar)  #szobaszámot később adjuk meg
+        self.tipus = "kétágyas"
 
     def info(self):
-        return f"Kétagyas szoba, Ár: {self.ar} Ft/éj"
+        return f"Kétágyas szoba, Ár: {self.ar} Ft/éj"
 
 import datetime
 
@@ -27,17 +27,17 @@ class Szalloda:
     def __init__(self, nev, cim):
         self.nev = nev
         self.cim = cim
-        self.szobak = []  # Szobák listája
-        self.foglalasok = []  # Foglalások listája
+        self.szobak = []  #szobák listája
+        self.foglalasok = []  #foglalások listája
 
     def szoba_hozzaadas(self, szobaszam, ar, tipus):
         if tipus == "egyágyas":
             szoba = EgyagyasSzoba(ar)
-        elif tipus == "kétagyas":
+        elif tipus == "kétágyas":
             szoba = KetagyasSzoba(ar)
         else:
             return "Ismeretlen szoba típus"
-        szoba.szobaszam = szobaszam  # Szobaszám hozzárendelése
+        szoba.szobaszam = szobaszam  #szobaszám hozzárendelése
         self.szobak.append(szoba)
         return f"Szoba hozzáadva: {szobaszam}"
 
@@ -92,14 +92,14 @@ class Foglalas:
                 f"Vendég: {self.vendeg_neve}")
 
     def szoba_foglalas(self, tipus, datum, vendeg_neve):
-        # Ellenőrizzük, hogy a szoba létezik-e és elérhető-e a megadott napon
+        #ellenőrizzük, hogy a szoba létezik-e és elérhető-e a megadott napon
         szoba = next((sz for sz in self.szobak if sz.szobaszam == szobaszam), None)
         if not szoba:
             return "A megadott számú szoba nem létezik."
         if any(f.szobaszam == szobaszam and f.datum == datum for f in self.foglalasok):
             return "A szoba már foglalt ezen a napon."
 
-        # Szoba foglalása
+        #szoba foglalása
         foglalas = Foglalas(szobaszam, datum, vendeg_neve)
         self.foglalasok.append(foglalas)
         return f"A foglalás sikeres. Ár: {szoba.ar} Ft/éj"
@@ -115,7 +115,7 @@ def felhasznaloi_interfesz(hotel):
         valasztas = input("Válassz egy opciót (1-4): ")
 
         if valasztas == "1":
-            tipus = input("Add meg a szoba típusát (egyágyas/kétagyas): ")
+            tipus = input("Add meg a szoba típusát (egyágyas/kétágyas): ")
             datum = input("Add meg a foglalás dátumát (éééé-hh-nn): ")
             vendeg_neve = input("Add meg a vendég nevét: ")
             print(hotel.szoba_foglalas(tipus, datum, vendeg_neve))
@@ -133,9 +133,11 @@ def felhasznaloi_interfesz(hotel):
             print("Érvénytelen választás, kérlek próbáld újra.")
 
 
-hotel = Szalloda("Hotel Budapest", "Budapest, Bajcsy-Zsilinszky út 1.")
+hotel = Szalloda("Hotel Budapest", "Budapest, Király utca 1.")
 hotel.szoba_hozzaadas(101, 20000, "egyágyas")
 hotel.szoba_hozzaadas(102, 20000, "egyágyas")
-hotel.szoba_hozzaadas(201, 30000, "kétagyas")
-hotel.szoba_hozzaadas(202, 30000, "kétagyas")
+hotel.szoba_hozzaadas(103, 20000, "egyágyas")
+hotel.szoba_hozzaadas(201, 30000, "kétágyas")
+hotel.szoba_hozzaadas(202, 30000, "kétágyas")
+hotel.szoba_hozzaadas(203, 30000, "kétágyas")
 felhasznaloi_interfesz(hotel)
