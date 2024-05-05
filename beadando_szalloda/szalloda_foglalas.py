@@ -8,7 +8,7 @@ class Szoba(ABC):
 class EgyagyasSzoba(Szoba):
     def __init__(self, ar):
         super().__init__(None, ar)  # Szobaszámot később adjuk meg
-        self.tipus = "Egyágyas"
+        self.tipus = "egyágyas"
 
     def info(self):
         return f"Egyágyas szoba, Ár: {self.ar} Ft/éj"
@@ -16,10 +16,12 @@ class EgyagyasSzoba(Szoba):
 class KetagyasSzoba(Szoba):
     def __init__(self, ar):
         super().__init__(None, ar)  # Szobaszámot később adjuk meg
-        self.tipus = "Kétagyas"
+        self.tipus = "kétagyas"
 
     def info(self):
         return f"Kétagyas szoba, Ár: {self.ar} Ft/éj"
+
+import datetime
 
 class Szalloda:
     def __init__(self, nev, cim):
@@ -52,9 +54,16 @@ class Szalloda:
         return "\n".join(szoba.info() for szoba in self.szobak)
 
     def szoba_foglalas(self, tipus, datum, vendeg_neve):
+        try:
+            foglalasi_datum = datetime.datetime.strptime(datum, "%Y-%m-%d")
+            if foglalasi_datum <= datetime.datetime.now():
+                return "A megadott dátum nem érvényes. Kérjük, jövőbeli dátumot adjon meg."
+        except ValueError:
+            return "Érvénytelen dátumformátum. Kérem a 'YYYY-MM-DD' formátumot használja."
         # Keresünk egy elérhető szobát a megadott típus alapján
         for szoba in self.szobak:
-            if szoba.tipus == tipus and all(f.szobaszam != szoba.szobaszam or f.datum != datum for f in self.foglalasok):
+            foglalasok_a_napon = [f for f in self.foglalasok if f.szobaszam == szoba.szobaszam and f.datum == datum]
+            if szoba.tipus == tipus and not foglalasok_a_napon:
                 foglalas = Foglalas(szoba.szobaszam, datum, vendeg_neve)
                 self.foglalasok.append(foglalas)
                 return f"A foglalás sikeres. Szobaszám: {szoba.szobaszam}, Ár: {szoba.ar} Ft/éj"
@@ -111,8 +120,10 @@ def felhasznaloi_interfesz(hotel):
             vendeg_neve = input("Add meg a vendég nevét: ")
             print(hotel.szoba_foglalas(tipus, datum, vendeg_neve))
         elif valasztas == "2":
-            # A lemondás kezelése változatlan
-            elif valasztas == "3":
+            szobaszam = input("Add meg a szoba számát, amelyik foglalást le szeretnéd mondani: ")
+            datum = input("Add meg a foglalás dátumát (éééé-hh-nn): ")
+            print(hotel.foglalas_lemondas(int(szobaszam), datum))
+        elif valasztas == "3":
             print("Aktív foglalások listája:")
             print(hotel.foglalasok_listazasa())
         elif valasztas == "4":
@@ -121,5 +132,10 @@ def felhasznaloi_interfesz(hotel):
         else:
             print("Érvénytelen választás, kérlek próbáld újra.")
 
+
 hotel = Szalloda("Hotel Budapest", "Budapest, Bajcsy-Zsilinszky út 1.")
+hotel.szoba_hozzaadas(101, 20000, "egyágyas")
+hotel.szoba_hozzaadas(102, 20000, "egyágyas")
+hotel.szoba_hozzaadas(201, 30000, "kétagyas")
+hotel.szoba_hozzaadas(202, 30000, "kétagyas")
 felhasznaloi_interfesz(hotel)
